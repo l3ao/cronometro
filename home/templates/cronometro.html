@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script>
+        Pusher.logToConsole = true;
+            var pusher = new Pusher('c03bfc6f1ab661057eac', {
+            cluster: 'us2'
+        });
+    </script>
+</head>
+<body>
+    <h1>Cronometro</h1>
+<!--    <input type="hidden" id="minutos" value="05">-->
+<!--    <input type="hidden" id="segundos" value="00">-->
+
+    <h4>Minutos:</h4>
+    <select name="minutos" id="minutos"></select>
+    <h4>Segundos:</h4>
+    <select name="segundos" id="segundos"></select>
+    <div id="display">
+        <h3>00:00</h3>
+    </div>
+
+    <script>
+        var display = document.getElementById('display')
+
+        var minutos = document.getElementById('minutos')
+        var segundos = document.getElementById('segundos')
+
+        var minutoAtual
+        var segundoAtual
+
+        var interval
+
+        let cron;
+
+        for(var i = 0; i<=60; i++){
+            minutos.innerHTML+='<option value='+i+'>'+i+'</option>';
+        }
+
+        for(var i=0; i<=60; i++){
+            segundos.innerHTML+='<option value='+i+'>'+i+'</option>';
+        }
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_start', function(data) {
+          clearInterval(cron);
+          minutoAtual = minutos.value
+          segundoAtual = segundos.value
+          display.childNodes[1].innerHTML = minutoAtual+": "+segundoAtual
+          cron = setInterval(() => {timer();}, 1000);
+        });
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_pause', function(data) {
+           clearInterval(cron);
+        });
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_reset', function(data) {
+            clearInterval(cron);
+            minutos.value = 0;
+            segundos.value = 0;
+            display.childNodes[1].innerHTML = "00:00"
+        });
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_acresc_um', function(data) {
+          clearInterval(cron);
+          minutoAtual = minutoAtual + 1
+          segundoAtual = segundoAtual
+          display.childNodes[1].innerHTML = minutoAtual+": "+segundoAtual
+          cron = setInterval(() => {timer();}, 1000);
+        });
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_acresc_tres', function(data) {
+          clearInterval(cron);
+          minutoAtual = minutoAtual + 3
+          segundoAtual = segundoAtual
+          display.childNodes[1].innerHTML = minutoAtual+": "+segundoAtual
+          cron = setInterval(() => {timer();}, 1000);
+        });
+
+        var channel = pusher.subscribe('my-channel-test');
+        channel.bind('event_acresc_cinco', function(data) {
+          clearInterval(cron);
+          minutoAtual = minutoAtual + 5
+          segundoAtual = segundoAtual
+          display.childNodes[1].innerHTML = minutoAtual+": "+segundoAtual
+          cron = setInterval(() => {timer();}, 1000);
+        });
+
+        function timer() {
+              segundoAtual--;
+
+              if(segundoAtual<=0){
+                  if(minutoAtual>0){
+                      minutoAtual--
+                      segundoAtual=59
+                  }else{
+                      alert('acabou o tempo!')
+                      clearInterval(interval)
+                  }
+              }
+
+              display.childNodes[1].innerHTML = minutoAtual+": "+segundoAtual
+        }
+    </script>
+</body>
+</html>
